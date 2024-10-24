@@ -1,0 +1,62 @@
+reverse_indices = aggregate(select(indices, length-indices-1, ==), indices);
+
+def rotate(seq,n) {
+        return aggregate(
+                select(indices,indices+length-n,==) or select(indices+n,indices,==), tokens);
+}
+
+def _swap(seq) {
+        return aggregate(select(indices, indices + 1, ==), seq, "")
+                if indices % 2 == 0
+                        else aggregate(select(indices, indices-1, ==), seq, "");
+}
+
+def swap(seq) {
+        return aggregate(select(indices, indices, ==), seq, "")
+        if length % 2 == 1 and indices == length - 1
+                else _swap(seq);
+}
+
+def maxseq(seq) {
+        select_earlier_in_sorted =
+                select(seq,seq,<) or (select(seq,seq,==)
+                and select(indices,indices,<));
+        target_position =
+                selector_width(select_earlier_in_sorted);
+        select_new_val =
+                select(target_position,indices,==);
+        return aggregate(select_new_val,seq)[-1];
+}
+
+def reverse_ag(seq) {
+        dollar_sign_index = aggregate(select_from_first(seq, "$"), indices);
+        _dollar_selector = select(indices, dollar_sign_index, <=);
+        return aggregate((_dollar_selector and select(indices, indices, ==))
+                or (_dollar_selector and select(indices, dollar_sign_index*2 - indices, ==)), seq, "");
+}
+
+def howmany(seq, t) {
+        return count(seq, t);
+}
+
+def howmanysofar(seq, n) {
+        return round((indices+1) * aggregate(select(indices, indices, <=), indicator(seq==n)));
+}
+
+def sort_ag(seq) {
+        dollar_sign_index = aggregate(select_from_first(seq, "$"), indices);
+        _dollar_selector = select(indices, dollar_sign_index, <);
+        select_earlier_in_sorted =
+                (select(seq,seq,<) or (select(seq,seq,==)
+                and select(indices,indices,<))
+                and _dollar_selector);
+        target_position =
+                selector_width(select_earlier_in_sorted);
+        select_new_val =
+                select(target_position+dollar_sign_index+1 if indices < dollar_sign_index
+                        else target_position-1,indices,==);
+        return aggregate((_dollar_selector and select(indices, indices, ==))
+                or (_dollar_selector and select_new_val)
+                or (select(tokens, "$", ==)
+                and select("$", tokens,==)), seq, "");
+}
