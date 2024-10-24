@@ -1,5 +1,10 @@
 # Functions in RASP
 
+RASP is an esolang designed to model the transformer architecture as described in the ICML 2021
+paper [Thinking Like Transformers](https://doi.org/10.48550/arXiv.2106.06981). Please see the [RASP
+repository](https://github.com/tech-srl/RASP) for setup and documentation.
+
+## Examples
 An s-op that contains the indices in reverse order.
 ```
 >> reverse_indices = aggregate(select(indices, length-indices-1, ==), indices);
